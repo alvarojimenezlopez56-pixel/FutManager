@@ -112,11 +112,4 @@ En cumplimiento de las directrices del proyecto, se ha creado el directorio `age
 - **`qa-agent.txt`**: Lógica de verificación y cobertura de pruebas para el agente QA enfocado en JUnit.
 - **`codex-agent-logic.json`**: Configuración técnica de comportamiento de los agentes.
 
----
-
-## 📄 Documentación en PDF
-Se han incluido los siguientes documentos técnicos en formato PDF en la raíz del repositorio:
-- **`DTO.pdf`**: Explicación detallada de qué son los DTO (Data Transfer Objects), su importancia arquitectónica y cómo se incorporaron al proyecto en las capas de persistencia y comunicación REST manteniendo toda la funcionalidad y robustez del sistema.
-- **`MAPEO.pdf`**: Póster y diagrama visual explicativo de la transferencia de datos y mapeo automático entre entidades JPA y DTOs, detallando el flujo de información desde la base de datos hasta el cliente React.
-- **`EJERCICIO2.pdf`**: Análisis de calidad del código de backend identificando puntos de mejora, en particular cómo optimizar las entidades y modelos mediante constructores automáticos generados por Lombok utilizando `@AllArgsConstructor` y `@NoArgsConstructor`.
 
