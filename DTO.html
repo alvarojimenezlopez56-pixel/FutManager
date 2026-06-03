@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación: Patrón DTO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+        h1 {
+            color: #b59023;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 10px;
+            font-size: 2.2rem;
+            margin-top: 0;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 1.05rem;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f8f9fa;
+            border-left: 4px solid #d4af37;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .highlight-title {
+            font-weight: bold;
+            color: #b59023;
+            margin-bottom: 5px;
+        }
+        pre {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+
+    <h1>Documentación: Patrón DTO (Data Transfer Object)</h1>
+    <p>Este documento detalla la investigación, diseño e implementación del patrón DTO en el proyecto <strong>FutManager</strong>.</p>
+
+    <div class="highlight">
+        <div class="highlight-title">❓ ¿Qué es un DTO (Data Transfer Object)?</div>
+        <p>Un <strong>DTO (Objeto de Transferencia de Datos)</strong> es un patrón de diseño cuyo propósito es transportar datos entre diferentes capas o subsistemas de una aplicación (en nuestro caso, desde el Frontend en React hacia la API REST en Spring Boot, y viceversa).</p>
+    </div>
+
+    <h2>🌟 Ventajas de Incorporar DTOs en el Proyecto</h2>
+    <ul>
+        <li><strong>Desacoplamiento:</strong> Separa el modelo de persistencia (Base de Datos / JPA Entities) de la representación en la API REST. Si cambias una columna en la base de datos, no rompes directamente la interfaz del frontend.</li>
+        <li><strong>Seguridad:</strong> Evita la exposición involuntaria de campos internos (como IDs autoincrementales innecesarios, campos de auditoría, contraseñas, etc.).</li>
+        <li><strong>Eficiencia en Red:</strong> Permite empaquetar únicamente los datos necesarios para una vista específica, reduciendo el tamaño del cuerpo JSON en las peticiones HTTP.</li>
+        <li><strong>Prevención de Bucles de Serialización:</strong> En relaciones bidireccionales JPA (como <code>@ManyToOne</code> y <code>@OneToMany</code>), serializar directamente las entidades a JSON genera bucles infinitos (StackOverflowError). Los DTOs aplanan las relaciones evitando este problema.</li>
+    </ul>
+
+    <h2>🛠️ Cómo se Incorporan en FutManager (Manteniendo la Funcionalidad)</h2>
+    <p>Dividimos los DTOs en dos grupos principales:</p>
+    <ul>
+        <li><strong>Request DTOs:</strong> Reciben payloads de escritura (<code>POST</code>, <code>PUT</code>). Utilizan IDs simples para vincular relaciones (ej. <code>jugadorId</code> en vez del objeto <code>Jugador</code> completo) facilitando la entrada JSON.</li>
+        <li><strong>Response DTOs:</strong> Envían payloads detallados de lectura (<code>GET</code>). Anidan otros DTOs para estructurar la respuesta y que el frontend muestre nombres de equipos, países, etc.</li>
+    </ul>
+
+    <h2>📸 Código e Implementación de los DTOs en el Backend</h2>
+
+    <h3>1. DTO de Carta FUT (Peticiones de Escritura)</h3>
+    <p>Archivo: <code>CartaFUTRequestDTO.java</code></p>
+    <pre><span class="keyword">package</span> com.futmanager.dto;
+
+<span class="keyword">public class</span> <span class="class-name">CartaFUTRequestDTO</span> {
+    <span class="keyword">private</span> <span class="class-name">Long</span> id;
+    <span class="keyword">private</span> <span class="class-name">Long</span> jugadorId; <span class="comment">// ID simple para evitar mandar el objeto completo</span>
+    <span class="keyword">private</span> <span class="class-name">Long</span> equipoId;  <span class="comment">// ID de equipo asociado</span>
+    <span class="keyword">private int</span> media;
+    <span class="keyword">private int</span> ritmo;
+    <span class="keyword">private int</span> tiro;
+    <span class="keyword">private int</span> pase;
+    <span class="keyword">private int</span> regate;
+    <span class="keyword">private int</span> defensa;
+    <span class="keyword">private int</span> fisico;
+    <span class="keyword">private</span> <span class="class-name">String</span> tipoCarta;
+
+    <span class="comment">// Constructores, Getters y Setters...</span>
+}</pre>
+
+    <h3>2. DTO de Carta FUT (Respuestas de Lectura)</h3>
+    <p>Archivo: <code>CartaFUTResponseDTO.java</code></p>
+    <pre><span class="keyword">package</span> com.futmanager.dto;
+
+<span class="keyword">public class</span> <span class="class-name">CartaFUTResponseDTO</span> {
+    <span class="keyword">private</span> <span class="class-name">Long</span> id;
+    <span class="keyword">private</span> <span class="class-name">JugadorDTO</span> jugador; <span class="comment">// DTO anidado</span>
+    <span class="keyword">private</span> <span class="class-name">EquipoDTO</span> equipo;   <span class="comment">// DTO anidado</span>
+    <span class="keyword">private int</span> media;
+    <span class="keyword">private int</span> ritmo;
+    <span class="keyword">private int</span> tiro;
+    <span class="keyword">private int</span> pase;
+    <span class="keyword">private int</span> regate;
+    <span class="keyword">private int</span> defensa;
+    <span class="keyword">private int</span> fisico;
+    <span class="keyword">private</span> <span class="class-name">String</span> tipoCarta;
+
+    <span class="comment">// Constructores, Getters y Setters...</span>
+}</pre>
+
+    <h3>3. DTO de Alineación (Request de Guardado)</h3>
+    <p>Archivo: <code>AlineacionRequestDTO.java</code></p>
+    <pre><span class="keyword">package</span> com.futmanager.dto;
+
+<span class="keyword">import</span> java.util.<span class="class-name">Map</span>;
+
+<span class="keyword">public class</span> <span class="class-name">AlineacionRequestDTO</span> {
+    <span class="keyword">private</span> <span class="class-name">Long</span> id;
+    <span class="keyword">private</span> <span class="class-name">String</span> nombre;
+    <span class="keyword">private</span> <span class="class-name">String</span> formacion;
+    <span class="keyword">private</span> <span class="class-name">Map</span>&lt;<span class="class-name">String</span>, <span class="class-name">Long</span>&gt; posiciones; <span class="comment">// Clave -> ID de la carta</span>
+
+    <span class="comment">// Constructores, Getters y Setters...</span>
+}</pre>
+
+    <h2>🔄 Clases Mapeadoras (Mappers)</h2>
+    <p>Implementamos clases mapeadoras para traducir entre entidades y DTOs de manera segura y controlada. Ejemplo de <code>CartaFUTMapper.java</code>:</p>
+    <pre><span class="keyword">public class</span> <span class="class-name">CartaFUTMapper</span> {
+    <span class="keyword">public static</span> <span class="class-name">CartaFUTResponseDTO</span> toResponseDTO(<span class="class-name">CartaFUT</span> carta) {
+        <span class="keyword">if</span> (carta == <span class="keyword">null</span>) <span class="keyword">return null</span>;
+        <span class="keyword">return new</span> <span class="class-name">CartaFUTResponseDTO</span>(
+                carta.getId(),
+                <span class="class-name">JugadorMapper</span>.toDTO(carta.getJugador()),
+                <span class="class-name">EquipoMapper</span>.toDTO(carta.getEquipo()),
+                carta.getMedia(),
+                carta.getRitmo(),
+                carta.getTiro(),
+                carta.getPase(),
+                carta.getRegate(),
+                carta.getDefensa(),
+                carta.getFisico(),
+                carta.getTipoCarta()
+        );
+    }
+}</pre>
+
+</body>
+</html>

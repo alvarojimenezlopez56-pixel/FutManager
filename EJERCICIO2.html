@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Propuesta de Solución: Ejercicio 2</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+        h1 {
+            color: #2980b9;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.2rem;
+            margin-top: 0;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 35px;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 1.05rem;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .highlight-title {
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 5px;
+        }
+        pre {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.92rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .annotation { color: #569cd6; }
+    </style>
+</head>
+<body>
+
+    <h1>Propuesta de Solución: Ejercicio 2</h1>
+    <p>Este documento expone la propuesta de mejora para el código del backend, centrada en la optimización del código repetitivo (boilerplate) mediante el uso de anotaciones de Lombok en los modelos JPA.</p>
+
+    <div class="highlight">
+        <div class="highlight-title">🔍 Hallazgo: Código Boilerplate Redundante en Modelos</div>
+        <p>Al analizar los modelos JPA en el backend (<code>Jugador.java</code>, <code>Equipo.java</code>, <code>CartaFUT.java</code> y <code>Alineacion.java</code>), se constata que todos contienen constructores vacíos, constructores con todos los campos, getters y setters implementados manualmente por escrito. Dado que la dependencia de <strong>Lombok</strong> ya está añadida en el archivo <code>pom.xml</code> del proyecto, esta redundancia puede simplificarse de forma óptima.</p>
+    </div>
+
+    <h2>💡 Solución Propuesta: Constructores Automáticos con Lombok</h2>
+    <p>Podemos optimizar la declaración de las clases de modelo utilizando anotaciones de la librería Lombok en la cabecera de la clase:</p>
+    <ul>
+        <li><strong><code>@NoArgsConstructor</code></strong>: Genera automáticamente el constructor sin argumentos (obligatorio para la persistencia de JPA / Hibernate).</li>
+        <li><strong><code>@AllArgsConstructor</code></strong>: Genera de forma automática un constructor parametrizado que acepta un argumento por cada atributo definido en la clase.</li>
+        <li><strong><code>@Getter</code> / <code>@Setter</code></strong>: Autogeneran los métodos de acceso y asignación en tiempo de compilación.</li>
+    </ul>
+
+    <h2>🛠️ Comparativa de Código (Caso de Estudio: <code>Alineacion.java</code>)</h2>
+
+    <h3>Antes (Estructura Manual Extensa - 69 líneas):</h3>
+    <pre><span class="keyword">package</span> com.futmanager.model;
+
+<span class="keyword">import</span> jakarta.persistence.*;
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.List;
+
+<span class="annotation">@Entity</span>
+<span class="keyword">public class</span> <span class="class-name">Alineacion</span> {
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="keyword">private</span> <span class="class-name">Long</span> id;
+    <span class="keyword">private</span> <span class="class-name">String</span> nombre;
+    <span class="keyword">private</span> <span class="class-name">String</span> formacion;
+
+    <span class="annotation">@OneToMany</span>(mappedBy = <span class="string">"alineacion"</span>, cascade = CascadeType.ALL, orphanRemoval = <span class="keyword">true</span>)
+    <span class="keyword">private</span> <span class="class-name">List</span>&lt;<span class="class-name">AlineacionPosicion</span>&gt; posiciones = <span class="keyword">new</span> <span class="class-name">ArrayList</span>&lt;&gt;();
+
+    <span class="comment">// Constructor vacío manual</span>
+    <span class="keyword">public</span> <span class="class-name">Alineacion</span>() {}
+
+    <span class="comment">// Constructor con argumentos manual</span>
+    <span class="keyword">public</span> <span class="class-name">Alineacion</span>(<span class="class-name">Long</span> id, <span class="class-name">String</span> nombre, <span class="class-name">String</span> formacion) {
+        <span class="keyword">this</span>.id = id;
+        <span class="keyword">this</span>.nombre = nombre;
+        <span class="keyword">this</span>.formacion = formacion;
+    }
+
+    <span class="comment">// Getters y Setters manuales (Ocupan gran espacio)...</span>
+    <span class="keyword">public</span> <span class="class-name">Long</span> getId() { <span class="keyword">return</span> id; }
+    <span class="keyword">public void</span> setId(<span class="class-name">Long</span> id) { <span class="keyword">this</span>.id = id; }
+    <span class="keyword">public</span> <span class="class-name">String</span> getNombre() { <span class="keyword">return</span> nombre; }
+    <span class="keyword">public void</span> setNombre(<span class="class-name">String</span> nombre) { <span class="keyword">this</span>.nombre = nombre; }
+}</pre>
+
+    <h3>Después (Implementación Limpia con Lombok - 32 líneas):</h3>
+    <pre><span class="keyword">package</span> com.futmanager.model;
+
+<span class="keyword">import</span> jakarta.persistence.*;
+<span class="keyword">import</span> lombok.Getter;
+<span class="keyword">import</span> lombok.Setter;
+<span class="keyword">import</span> lombok.NoArgsConstructor;
+<span class="keyword">import</span> lombok.AllArgsConstructor;
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.List;
+
+<span class="annotation">@Entity</span>
+<span class="annotation">@Getter</span>
+<span class="annotation">@Setter</span>
+<span class="annotation">@NoArgsConstructor</span>
+<span class="annotation">@AllArgsConstructor</span>
+<span class="keyword">public class</span> <span class="class-name">Alineacion</span> {
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="keyword">private</span> <span class="class-name">Long</span> id;
+
+    <span class="keyword">private</span> <span class="class-name">String</span> nombre;
+    <span class="keyword">private</span> <span class="class-name">String</span> formacion;
+
+    <span class="annotation">@OneToMany</span>(mappedBy = <span class="string">"alineacion"</span>, cascade = CascadeType.ALL, orphanRemoval = <span class="keyword">true</span>)
+    <span class="keyword">private</span> <span class="class-name">List</span>&lt;<span class="class-name">AlineacionPosicion</span>&gt; posiciones = <span class="keyword">new</span> <span class="class-name">ArrayList</span>&lt;&gt;();
+}</pre>
+
+    <h2>📈 Beneficios de la Mejora</h2>
+    <ul>
+        <li><strong>Legibilidad del código:</strong> Permite a los desarrolladores enfocar la lectura directamente sobre los atributos y relaciones JPA sin ruido visual de boilerplate.</li>
+        <li><strong>Facilidad de mantenimiento:</strong> Al agregar o modificar campos, Lombok regenera los constructores y accesores automáticamente en la compilación.</li>
+        <li><strong>Reducción del tamaño físico del archivo:</strong> Reducción superior al 50% en las líneas de código de las clases.</li>
+    </ul>
+
+</body>
+</html>
