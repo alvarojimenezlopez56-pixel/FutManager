@@ -103,13 +103,4 @@ Se ha implementado un creador de alineaciones interactivo y dinámico:
   - **Coincidencias (Club, Liga y País)**: Suma puntos basándose en umbrales de jugadores en su posición correcta del mismo Club (2/5/8 jugadores), Liga (3/5/8 jugadores) y País/Nacionalidad (2/5/8 jugadores).
 - **Persistencia**: Permite asignar nombres a las plantillas y guardarlas en base de datos para cargarlas o eliminarlas posteriormente.
 
----
-
-## 🤖 Carpeta de Agentes de IA (`agents/`)
-En cumplimiento de las directrices del proyecto, se ha creado el directorio `agents/` en la raíz del repositorio, conteniendo:
-- **`Agents.md`**: Explicación detallada de la arquitectura multi-agente, roles y orquestación.
-- **`developer-agent.txt`**: Lógica, reglas de estilo y restricciones para el agente de codificación full-stack.
-- **`qa-agent.txt`**: Lógica de verificación y cobertura de pruebas para el agente QA enfocado en JUnit.
-- **`codex-agent-logic.json`**: Configuración técnica de comportamiento de los agentes.
-
 
